@@ -1,35 +1,42 @@
 #!/usr/bin/python3
+"""
+A script that converts a Markdown file to an HTML file.
+"""
+
 import sys
 import os
 
-def markdown2html(md_file, html_file):
-    try:
-        with open(md_file, 'r') as md:
-            markdown_content = md.read()
-
-        # Convert Markdown to HTML (using simple text replacement as an example)
-        html_content = markdown_content.replace("# ", "<h1>").replace("\n", "</h1>\n")
-
-        with open(html_file, 'w') as html:
-            html.write(html_content)
-
-    except Exception as e:
-        print(f"An error occurred: {e}", file=sys.stderr)
-
-def main():
+if __name__ == "__main__":
+    # Check if the number of arguments is less than 2
     if len(sys.argv) < 3:
         print("Usage: ./markdown2html.py README.md README.html", file=sys.stderr)
         sys.exit(1)
 
-    md_file = sys.argv[1]
-    html_file = sys.argv[2]
+    markdown_file = sys.argv[1]
+    output_html = sys.argv[2]
 
-    if not os.path.isfile(md_file):
-        print(f"Missing {md_file}", file=sys.stderr)
+    # Check if the Markdown file exists
+    if not os.path.isfile(markdown_file):
+        print(f"Missing {markdown_file}", file=sys.stderr)
         sys.exit(1)
 
-    markdown2html(md_file, html_file)
-    sys.exit(0)
+    # Convert the Markdown file to HTML
+    try:
+        with open(markdown_file, 'r') as md_file:
+            markdown_content = md_file.read()
 
+        with open(output_html, 'w') as html_file:
+            # Basic HTML structure wrapping the content of the Markdown file
+            html_file.write(markdown_content)
+
+<<<<<<< HEAD
 if __name__ == "__main__":
     main()
+=======
+        # If everything succeeds, exit with 0
+        sys.exit(0)
+
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
+>>>>>>> 8fa0df5c4ab6d325b159198a8323a1bf531e3cf2
