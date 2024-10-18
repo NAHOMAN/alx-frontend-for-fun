@@ -29,10 +29,6 @@ if __name__ == "__main__":
             # Basic HTML structure wrapping the content of the Markdown file
             html_file.write(markdown_content)
 
-<<<<<<< HEAD
-if __name__ == "__main__":
-    main()
-=======
         # If everything succeeds, exit with 0
         sys.exit(0)
 
