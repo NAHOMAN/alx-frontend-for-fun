@@ -5,56 +5,68 @@ A script that converts a Markdown file to an HTML file.
 
 import sys
 import os
+import re
 
-def parse_markdown_line(line):
-    """Convert a single line of markdown into HTML."""
-    line = line.strip()  # Clean up leading/trailing spaces
-    if line.startswith("# "):
-        return f"<h1>{line[2:].strip()}</h1>"
-    elif line.startswith("## "):
-        return f"<h2>{line[3:].strip()}</h2>"
-    elif line.startswith("### "):
-        return f"<h3>{line[4:].strip()}</h3>"
-    elif line.startswith("#### "):
-        return f"<h4>{line[5:].strip()}</h4>"
-    elif line.startswith("##### "):
-        return f"<h5>{line[6:].strip()}</h5>"
-    elif line.startswith("###### "):
-        return f"<h6>{line[7:].strip()}</h6>"
-    elif line:
-        return f"<p>{line}</p>"  # Treat any non-heading non-empty line as a paragraph
-    return ""  # Empty lines are ignored
+class MarkdownConverter:
+    """A class to convert Markdown to HTML."""
 
-def convert_markdown_to_html(markdown_content):
-    """Convert a markdown text into corresponding HTML."""
-    html_content = []
-    for line in markdown_content.splitlines():
-        html_line = parse_markdown_line(line)
-        if html_line:  # Only add non-empty lines
-            html_content.append(html_line)
-    return "\n".join(html_content)
+    def __init__(self, markdown_file, output_file):
+        self.markdown_file = markdown_file
+        self.output_file = output_file
+
+    def check_file_exists(self):
+        """Check if the markdown file exists."""
+        if not os.path.isfile(self.markdown_file):
+            print(f"Missing {self.markdown_file}", file=sys.stderr)
+            sys.exit(1)
+
+    @staticmethod
+    def parse_markdown(markdown_content):
+        """Convert Markdown content to HTML."""
+        html_lines = []
+        for line in markdown_content.splitlines():
+            line = line.strip()
+            if not line:  # Skip empty lines
+                continue
+            # Check for headings using regular expressions
+            heading_match = re.match(r'^(#{1,6}) (.+)', line)
+            if heading_match:
+                level = len(heading_match.group(1))  # Count the number of '#' symbols
+                title = heading_match.group(2).strip()
+                html_lines.append(f"<h{level}>{title}</h{level}>")
+            else:
+                # Convert regular text to paragraph
+                html_lines.append(f"<p>{line}</p>")
+        return "\n".join(html_lines)
+
+    def convert(self):
+        """Read the Markdown file and write the HTML output."""
+        with open(self.markdown_file, 'r') as md_file:
+            markdown_content = md_file.read()
+        html_body = self.parse_markdown(markdown_content)
+        
+        # Write the HTML content to the output file
+        with open(self.output_file, 'w') as html_file:
+            html_file.write("<!DOCTYPE html>\n<html>\n<head>\n<title>Markdown to HTML</title>\n</head>\n<body>\n")
+            html_file.write(html_body)
+            html_file.write("\n</body>\n</html>")
 
 if __name__ == "__main__":
-    # Check if the number of arguments is less than 2
+    # Validate the number of arguments
     if len(sys.argv) < 3:
         print("Usage: ./markdown2html.py README.md README.html", file=sys.stderr)
         sys.exit(1)
 
     markdown_file = sys.argv[1]
-    output_html = sys.argv[2]
+    output_file = sys.argv[2]
 
-    # Check if the Markdown file exists
-    if not os.path.isfile(markdown_file):
-        print(f"Missing {markdown_file}", file=sys.stderr)
-        sys.exit(1)
+    # Create a converter instance and process the file
+    converter = MarkdownConverter(markdown_file, output_file)
+    converter.check_file_exists()
 
-    # Convert the Markdown file to HTML
     try:
-        with open(markdown_file, 'r') as md_file:
-            markdown_content = md_file.read()
-
-        # Convert markdown content to HTML
-        html_body = convert_markdown_to_html(markdown_content)
-
-        # Write the HTML content to the output file
-        with open(output_html, 'w') a
+        converter.convert()
+        sys.exit(0)
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
