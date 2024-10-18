@@ -26,12 +26,8 @@ if __name__ == "__main__":
             markdown_content = md_file.read()
 
         with open(output_html, 'w') as html_file:
-            # Basic HTML structure wrapping the content of the Markdown file
+            # Write the content from the Markdown file to the HTML file
             html_file.write(markdown_content)
 
-        # If everything succeeds, exit with 0
+        # Successful execution
         sys.exit(0)
-
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
