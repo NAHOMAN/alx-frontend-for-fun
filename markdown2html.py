@@ -6,26 +6,32 @@ A script that converts a Markdown file to an HTML file.
 import sys
 import os
 
+def parse_markdown_line(line):
+    """Convert a single line of markdown into HTML."""
+    line = line.strip()  # Clean up leading/trailing spaces
+    if line.startswith("# "):
+        return f"<h1>{line[2:].strip()}</h1>"
+    elif line.startswith("## "):
+        return f"<h2>{line[3:].strip()}</h2>"
+    elif line.startswith("### "):
+        return f"<h3>{line[4:].strip()}</h3>"
+    elif line.startswith("#### "):
+        return f"<h4>{line[5:].strip()}</h4>"
+    elif line.startswith("##### "):
+        return f"<h5>{line[6:].strip()}</h5>"
+    elif line.startswith("###### "):
+        return f"<h6>{line[7:].strip()}</h6>"
+    elif line:
+        return f"<p>{line}</p>"  # Treat any non-heading non-empty line as a paragraph
+    return ""  # Empty lines are ignored
+
 def convert_markdown_to_html(markdown_content):
-    """Convert simple markdown headings to HTML."""
+    """Convert a markdown text into corresponding HTML."""
     html_content = []
     for line in markdown_content.splitlines():
-        # Check for Markdown headings and convert them to HTML
-        if line.startswith("# "):
-            html_content.append(f"<h1>{line[2:]}</h1>")
-        elif line.startswith("## "):
-            html_content.append(f"<h2>{line[3:]}</h2>")
-        elif line.startswith("### "):
-            html_content.append(f"<h3>{line[4:]}</h3>")
-        elif line.startswith("#### "):
-            html_content.append(f"<h4>{line[5:]}</h4>")
-        elif line.startswith("##### "):
-            html_content.append(f"<h5>{line[6:]}</h5>")
-        elif line.startswith("###### "):
-            html_content.append(f"<h6>{line[7:]}</h6>")
-        else:
-            html_content.append(line)  # For now, leave non-heading text unchanged
-    
+        html_line = parse_markdown_line(line)
+        if html_line:  # Only add non-empty lines
+            html_content.append(html_line)
     return "\n".join(html_content)
 
 if __name__ == "__main__":
@@ -47,18 +53,8 @@ if __name__ == "__main__":
         with open(markdown_file, 'r') as md_file:
             markdown_content = md_file.read()
 
-        # Convert the markdown content to HTML format
+        # Convert markdown content to HTML
         html_body = convert_markdown_to_html(markdown_content)
 
-        # Write the output to the HTML file with basic HTML structure
-        with open(output_html, 'w') as html_file:
-            html_file.write("<!DOCTYPE html>\n<html>\n<head>\n<title>Markdown to HTML</title>\n</head>\n<body>\n")
-            html_file.write(html_body)
-            html_file.write("\n</body>\n</html>")
-
-        # Successful execution
-        sys.exit(0)
-
-    except Exception as e:
-        print(f"Error: {e}", file=sys.stderr)
-        sys.exit(1)
+        # Write the HTML content to the output file
+        with open(output_html, 'w') a
