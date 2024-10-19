@@ -6,18 +6,43 @@ A script that converts a Markdown file to an HTML file.
 import sys
 import os
 
+def parse_heading(line):
+    """
+    Convert markdown heading syntax to HTML heading.
+    Example: 
+    # Heading 1 => <h1>Heading 1</h1>
+    """
+    heading_level = 0
+    for char in line:
+        if char == '#':
+            heading_level += 1
+        else:
+            break
+    
+    # Ensure the line starts with heading markdown syntax
+    if heading_level > 0 and heading_level <= 6 and line[heading_level] == ' ':
+        heading_content = line[heading_level+1:].strip()  # Get the content after the #
+        return f"<h{heading_level}>{heading_content}</h{heading_level}>"
+    else:
+        return line
+
 def markdown_to_html(md_file, html_file):
     """
     Converts the content of a Markdown file to a simple HTML file.
-    For now, this only copies the content directly.
     """
     try:
         with open(md_file, 'r') as md:
-            markdown_content = md.read()
+            markdown_content = md.readlines()
 
         with open(html_file, 'w') as html:
-            # Currently, no markdown parsing is implemented, so the content is written directly.
-            html.write(markdown_content)
+            for line in markdown_content:
+                line = line.strip()
+                
+                # Check if the line is a heading and convert it
+                if line.startswith('#'):
+                    html.write(parse_heading(line) + '\n')
+                else:
+                    html.write(line + '\n')
 
     except Exception as e:
         print(f"Error: {e}", file=sys.stderr)
