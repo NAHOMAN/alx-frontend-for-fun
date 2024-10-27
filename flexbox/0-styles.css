@@ -193,7 +193,6 @@
   }
   
   [class*='col-'] {
-    float: left;
     padding: 0.5rem;
   }
   
@@ -204,7 +203,10 @@
   .col-1-2 {
     width: 50%;
   }
-  
+  .row {
+    display: flex;
+}
+ 
   /* Navbar
       ============================= */
   
